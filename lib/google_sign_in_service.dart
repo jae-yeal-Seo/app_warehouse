@@ -6,6 +6,8 @@ class GoogleSignInService {
   static final GoogleSignIn _googleSignIn = GoogleSignIn(
     // 필요에 따라 scopes를 추가할 수 있습니다
     scopes: ['email', 'profile'],
+    clientId:
+        '1234567890-abcdefghijklmnop.apps.googleusercontent.com', // 실제 클라이언트 ID로 변경
   );
 
   // Google Sign-In 프로세스
