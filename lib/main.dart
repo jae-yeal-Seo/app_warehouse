@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'google_sign_in_service.dart';
+import 'main_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -55,22 +56,28 @@ class _MyHomePageState extends State<MyHomePage> {
     final result = await GoogleSignInService.signInWithGoogle();
     setState(() {
       _isLoading = false;
-      if (result != null) {
-        _currentUser = result['user'];
-        _userInfo = result['userInfo'];
-
-        // 테스트용: user가 null이면 더미 사용자 생성
-        if (_currentUser == null && _userInfo != null) {
-          // 더미 사용자로 UI 테스트
-          print('더미 사용자로 로그인 처리');
-        }
-      }
     });
 
     if (result != null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Google 로그인 성공!')));
+      _currentUser = result['user'];
+      _userInfo = result['userInfo'];
+      final backendResponse = result['backendResponse'];
+
+      // 백엔드 로그인 성공 시 메인 화면으로 이동
+      if (backendResponse != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(backendResponse['message'] ?? '로그인 성공!')),
+        );
+
+        // 메인 화면으로 이동
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const MainScreen()),
+        );
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('백엔드 로그인 실패')));
+      }
     } else {
       ScaffoldMessenger.of(
         context,

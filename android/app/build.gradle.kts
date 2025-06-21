@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("kotlin-android")
+    id("com.google.gms.google-services")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
@@ -8,7 +9,7 @@ plugins {
 android {
     namespace = "com.example.anywhere_anytime_japanese"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -28,6 +29,33 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        val isProduction = System.getenv("PRODUCTION")?.toBoolean() ?: false
+        
+        // 환경에 따라 다른 google-services.json 파일 사용
+        val googleServicesFile = if (isProduction) {
+            "google-services-prod.json"
+        } else {
+            "google-services-dev.json"
+        }
+        
+        // google-services 플러그인에 파일 경로 지정
+        googleServices {
+            googleServicesFile(googleServicesFile)
+        }
+
+        // Add OAuth client ID from environment-based oauth-google-services.json
+        val oauthFile = if (isProduction) {
+            "oauth-google-services-prod.json"
+        } else {
+            "oauth-google-services-dev.json"
+        }
+        
+        val oauthConfig = file(oauthFile).readText()
+        val jsonObject = groovy.json.JsonSlurper().parseText(oauthConfig) as Map<*, *>
+        val installed = jsonObject["installed"] as Map<*, *>
+        val oauthClientId = installed["client_id"] as String
+        buildConfigField("String", "OAUTH_CLIENT_ID", "\"$oauthClientId\"")
     }
 
     buildTypes {
@@ -37,6 +65,9 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+
+    // Add buildConfigField support
+    buildFeatures.buildConfig = true
 }
 
 flutter {

@@ -1,3 +1,5 @@
+나중에 할 것들.txt
+
 # Miscellaneous
 *.class
 *.log
@@ -43,3 +45,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/android/app/google-services-dev.json
+/android/app/google-services-prod.json
+/android/app/oauth-google-services-dev.json
+/android/app/oauth-google-services-prod.json

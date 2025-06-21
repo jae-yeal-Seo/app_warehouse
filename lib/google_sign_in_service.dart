@@ -1,13 +1,14 @@
 import 'dart:convert';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
+import 'constants.dart';
 
 class GoogleSignInService {
   static final GoogleSignIn _googleSignIn = GoogleSignIn(
     // 필요에 따라 scopes를 추가할 수 있습니다
     scopes: ['email', 'profile'],
     clientId:
-        '1234567890-abcdefghijklmnop.apps.googleusercontent.com', // 실제 클라이언트 ID로 변경
+        '498248649874-vkekcrupr1uo5akoton3ds8mintv3kau.apps.googleusercontent.com', // 개발용 OAuth 클라이언트 ID
   );
 
   // Google Sign-In 프로세스
@@ -33,7 +34,7 @@ class GoogleSignInService {
       }
 
       // 1. 백엔드에는 idToken만 보냄
-      await sendIdTokenToBackend(idToken);
+      final responseData = await sendIdTokenToBackend(idToken);
 
       // 2. accessToken은 필요하면 Google API에 직접 사용
       final userInfo = await getUserInfoFromGoogle(accessToken);
@@ -43,6 +44,7 @@ class GoogleSignInService {
         'userInfo': userInfo,
         'idToken': idToken,
         'accessToken': accessToken,
+        'backendResponse': responseData, // 백엔드 응답 데이터 추가
       };
     } catch (error) {
       print('Google Sign-In 오류: $error');
@@ -51,21 +53,27 @@ class GoogleSignInService {
   }
 
   // 백엔드에 idToken 전송
-  static Future<void> sendIdTokenToBackend(String idToken) async {
+  static Future<Map<String, dynamic>?> sendIdTokenToBackend(
+    String idToken,
+  ) async {
     try {
       final response = await http.post(
-        Uri.parse('https://your-backend.com/google-login'),
+        Uri.parse('$kBackendBaseUrl/google-login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'id_token': idToken}),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseData = jsonDecode(response.body);
         print('백엔드 로그인 성공: ${response.body}');
+        return responseData; // 사용자 정보 반환
       } else {
         print('백엔드 로그인 실패: ${response.statusCode}');
+        return null;
       }
     } catch (error) {
       print('백엔드 통신 오류: $error');
+      return null;
     }
   }
 
