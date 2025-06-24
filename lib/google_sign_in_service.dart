@@ -7,8 +7,6 @@ class GoogleSignInService {
   static final GoogleSignIn _googleSignIn = GoogleSignIn(
     // 필요에 따라 scopes를 추가할 수 있습니다
     scopes: ['email', 'profile'],
-    clientId:
-        '498248649874-vkekcrupr1uo5akoton3ds8mintv3kau.apps.googleusercontent.com', // 개발용 OAuth 클라이언트 ID
   );
 
   // Google Sign-In 프로세스
@@ -16,25 +14,23 @@ class GoogleSignInService {
     try {
       // Google Sign-In 실행
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-
       if (googleUser == null) {
         // 사용자가 로그인을 취소한 경우
         return null;
       }
-
       // 인증 정보 가져오기
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
 
+      print('구글 인증 정보: $googleAuth.idToken');
       final String? idToken = googleAuth.idToken;
       final String? accessToken = googleAuth.accessToken;
-
       if (idToken == null || accessToken == null) {
         throw Exception('Google 인증 토큰을 가져올 수 없습니다.');
       }
-
       // 1. 백엔드에는 idToken만 보냄
       final responseData = await sendIdTokenToBackend(idToken);
+      print('responseData: $responseData');
 
       // 2. accessToken은 필요하면 Google API에 직접 사용
       final userInfo = await getUserInfoFromGoogle(accessToken);
