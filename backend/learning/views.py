@@ -1,7 +1,6 @@
 from django.shortcuts import render
 import json
 import requests
-from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User
@@ -22,7 +21,6 @@ def google_login(request):
     try:
         data = json.loads(request.body)
         id_token = data.get("id_token")
-
         if not id_token:
             return Response(
                 {"error": "ID token is required"}, status=status.HTTP_400_BAD_REQUEST
@@ -32,14 +30,11 @@ def google_login(request):
         google_response = requests.get(
             f"https://oauth2.googleapis.com/tokeninfo?id_token={id_token}"
         )
-
         if google_response.status_code != 200:
             return Response(
                 {"error": "Invalid ID token"}, status=status.HTTP_400_BAD_REQUEST
             )
-
         google_data = google_response.json()
-
         # Google에서 받은 사용자 정보
         google_id = google_data.get("sub")
         email = google_data.get("email")

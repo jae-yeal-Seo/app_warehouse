@@ -22,7 +22,6 @@ class GoogleSignInService {
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
 
-      print('구글 인증 정보: $googleAuth.idToken');
       final String? idToken = googleAuth.idToken;
       final String? accessToken = googleAuth.accessToken;
       if (idToken == null || accessToken == null) {
@@ -30,7 +29,6 @@ class GoogleSignInService {
       }
       // 1. 백엔드에는 idToken만 보냄
       final responseData = await sendIdTokenToBackend(idToken);
-      print('responseData: $responseData');
 
       // 2. accessToken은 필요하면 Google API에 직접 사용
       final userInfo = await getUserInfoFromGoogle(accessToken);
@@ -54,7 +52,7 @@ class GoogleSignInService {
   ) async {
     try {
       final response = await http.post(
-        Uri.parse('$kBackendBaseUrl/google-login'),
+        Uri.parse('$kBackendBaseUrl/google-login/'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'id_token': idToken}),
       );
