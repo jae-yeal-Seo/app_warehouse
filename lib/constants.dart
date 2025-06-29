@@ -7,4 +7,4 @@ const bool kIsProduction = bool.fromEnvironment(
 const String kBackendBaseUrl =
     kIsProduction
         ? 'https://your-production-domain.com' // 프로덕션 URL (나중에 실제 도메인으로 변경)
-        : 'http://192.168.36.161:8000'; // 로컬 개발 환경 (모바일 테더링)
+        : 'http://192.168.192.161:8000'; // 로컬 개발 환경 (현재 Wi-Fi IP)

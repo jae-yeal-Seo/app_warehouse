@@ -40,8 +40,7 @@ def google_login(request):
         email = google_data.get("email")
         name = google_data.get("name", "")
         picture = google_data.get("picture", "")
-        email_verified = google_data.get("email_verified", False)
-
+        email_verified = google_data.get("email_verified", False) == "true"
         # 기존 사용자 확인
         try:
             user = User.objects.get(google_id=google_id)
